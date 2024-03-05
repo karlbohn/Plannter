@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, flash, url_for, g, jsonify, session
 from sqlalchemy.exc import IntegrityError
-from models import db, connect_db, User
+from models import db, connect_db, User, Plan
 from forms import NewUserForm
 
 app = Flask(__name__)
@@ -13,6 +13,7 @@ app.app_context().push()
 curr_user = "curr_user"
 
 connect_db(app)
+db.drop_all()
 db.create_all()
 
 @app.before_request
@@ -40,7 +41,12 @@ def do_logout():
 
 @app.route('/')
 def homepage():
-    return render_template('base.html')
+    """Shows homepage and recent garden plans"""
+
+    plans = Plan.query.first()
+    
+    return render_template('home.html')
+    # return render_template('base.html')
 
 @app.route('/register', methods=["GET", "POST"])
 def signup():

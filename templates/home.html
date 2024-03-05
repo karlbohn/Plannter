@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Recent plans</h1>
+
+<ul>
+{% for plan in plans %}
+  <li>
+     <a href="/plan/{{ plan.id }}">{{ plan.title }}</a> by <a href="/user/{{ plan.owner_id }}">{{ plan.owner_id.username }}</a>
+  </li>
+{% endfor %}
+</ul>
+{% endblock %}
