@@ -27,6 +27,7 @@ def add_user_to_g():
 
     else:
         g.user = None
+        
 
 
 def do_login(user):
@@ -100,6 +101,11 @@ def logout():
     return redirect('/')
 
 @app.route('/user/<int:user_id>')
+def show_profile(user_id):
+
+    user = User.query.get(user_id)
+
+    return render_template("/users/show.html", user=user)
 # Should show user's public plans, also private plans if user's own profile, show profile information (except email), and have a link to edit profile information if it is the user's own profile
 
 @app.route('/user/<int:user_id>/edit', methods=["GET", "POST"])
@@ -109,11 +115,13 @@ def edit_profile(user_id):
     form = EditUserForm
     user = User.query.get(user_id)
 
-    form.data.username = user.username
-    form.data.email = user.email
-    form.data.zone = user.zone
-    # if 
+    form.username.data = user.username
+    form.email.data = user.email
+    form.zone.data = user.zone
 
-    flash('Profile Updated!')
-    return redirect(f'/user/{user_id}')
+    if form.validate_on_submit():
+        flash('Profile Updated!')
+        return redirect(f'/user/{user_id}')
+    
+    render_template('/users/edit.html')
 # Show EditForm to allow user to edit profile information
