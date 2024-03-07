@@ -38,6 +38,22 @@ class User(db.Model):
         db.session.add(user)
         return user
     
+    @classmethod
+    def authenticate(cls, username, password):
+        """
+        Find user with `username` and `password`.
+        If can't find matching user (or if password is wrong), returns False.
+        """
+
+        user = cls.query.filter_by(username=username).first()
+
+        if user:
+            is_auth = bcrypt.check_password_hash(user.password, password)
+            if is_auth:
+                return user
+
+        return False
+    
 class Plan(db.Model):
     """Users' Garden Plans"""
 
