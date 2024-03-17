@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+<!-- Shows details of an individual plan -->
+
+{% block content %}
+<h1>{{ plan.title }}</h1>
+
+<div class="container">
+    <div class="row">
+        {% for plant in plants %}
+        <div class="col">
+            <a href="/plants/{{ plant['id'] }}">{{ plant['common_name'] }}</a>
+                <ul>
+                    <li>Cycle: {{ plant['cycle'] }}</li>
+                    <li>Watering Needs: {{ plant['watering'] }}</li>
+                    {% if plant['default_image'] %}
+                    <img src="{{ plant['default_image']['thumbnail'] }}" alt="">
+                    {% else %}
+                    <img src="/static/images/no-image.png" alt="">
+                    {% endif %}
+                </ul>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Recent plans</h1>
 
+<!-- Add randomly generated "Plant Spotlight" section, showing off a random plant -->
+
+<h3>Recent plans</h3>
 <ul>
-{% for plan in plans %}
-  <li>
-     <a href="/plan/{{ plan.id }}">{{ plan.title }}</a> by <a href="/user/{{ plan.owner_id }}">{{ plan.owner_id.username }}</a>
-  </li>
-{% endfor %}
+  {% for plan in plans %}
+  <li><a href="/plans/{{ plan.id }}">{{ plan.title }}</a> created by <a href="/users/{{ plan.owner.id }}">{{ plan.owner.username }}</a></li>
+  {% endfor %}
 </ul>
 {% endblock %}

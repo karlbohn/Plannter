@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if page_num > 1 %}
+<a href="/plants/page/{{ page_num - 1 }}">< Previous Page</a>
+{% endif %}
+<a href="/plants/page{{ page_num + 1 }}">Next Page ></a>
+<div class="container">
+    <div class="row">
+        {% for plant in plants %}
+        <div class="col">
+            <a href="/plants/{{ plant['id'] }}">{{ plant['common_name'] }}</a>
+            <a href="/addplant/{{ plant['id'] }}">Add to plan</a>
+                <ul>
+                    <li>Cycle: {{ plant['cycle'] }}</li>
+                    <li>Watering Needs: {{ plant['watering'] }}</li>
+                    {% if plant['default_image'] %}
+                    <img src="{{ plant['default_image']['thumbnail'] }}" alt="">
+                    {% else %}
+                    <img src="/static/images/no-image.png" alt="">
+                    {% endif %}
+                </ul>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

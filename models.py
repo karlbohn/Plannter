@@ -14,12 +14,17 @@ class User(db.Model):
     password = db.Column(db.Text, nullable=False)
     email = db.Column(db.Text, nullable=False)
     zone = db.Column(db.Integer)
-    country = db.Column(db.Text)
+    country = db.Column(db.String)
 
     # Comment column wil lbe a list of all user comment IDs
-    comments = db.relationship('Comment')
+    # comments = db.relationship('Comment')
     
+    def __repr__(self):
+        """Show info about User"""
 
+        u = self
+        return f"<User {u.id} {u.username} {u.email} {u.zone} {u.country}>"
+    
     @classmethod
     def signup(cls, username, password, email):
         """Sign up user.
@@ -64,6 +69,8 @@ class Plan(db.Model):
     owner_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     private = db.Column(db.Boolean, default=False)
 
+    owner = db.Relationship('User')
+
 class PlantRole(db.Model):
     """Instances of plants in garden plans"""
 
@@ -81,7 +88,7 @@ class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     plant_id = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    comment = db.Column(db.Text, nullable=False)
+    content = db.Column(db.Text, nullable=False)
 
     user = db.relationship('User')
 

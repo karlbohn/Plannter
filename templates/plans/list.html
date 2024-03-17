@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% if g.user.id == user.id %}
+<div>
+    <h1>My Garden Plans</h1>
+    <ul>
+        {% for plan in plans %}
+        <li><a href="/plans/{{ plan.id }}">{{ plan.title }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+{% else %}
+<div>
+    <h1>{{ user.username }}'s Garden Plans</h1>
+    <ul>
+        {% for plan in plans %}
+        {% if plan.private is False %}
+        <li><a href="/plans/{{ plan.id }}">{{ plan.title }}</a></li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+{% endblock %}

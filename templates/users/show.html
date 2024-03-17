@@ -1,27 +1,62 @@
 {% extends 'base.html' %}
+
+
 {% block content %}
-<table>
-    <tr>
-        <td>Username</td>
-        <td>{{ user.username }}</td>
-    </tr>
+<table class ="table">
+    <tbody>
+        <tr>
+            <td>Username</td>
+            <td>{{ user.username }}</td>
+        </tr>
+        
+        <tr>
+            <td>Email</td>
+            <td>{{ user.email }}</td>
+        </tr>
     
-    <tr>
-        <td>Email</td>
-        <td>{{ user.email }}</td>
-    </tr>
-   
-    <tr>
-        <td>Zone</td>
-        <td>{{ user.zone }}</td>
-    </tr>
-    <!-- <tr>
-        <td>Username</td>
-        <td>{{ user.username }}</td>
-    </tr>
-    <tr>
-        <td>Username</td>
-        <td>{{ user.username }}</td>
-    </tr> -->
+        <tr>
+            <td>Zone</td>
+            {% if user.zone %}
+            <td>{{ user.zone }}</td>
+            {% else %}
+            <td> </td>
+            {% endif %}
+        </tr>
+        <tr>
+            <td>Country</td>
+            {% if user.country %}
+            <td>{{ user.country }}</td>
+            {% else %}
+            <td> </td>
+            {% endif %}
+        </tr>
+    </tbody>
 </table>
+
+{% if g.user.id == user.id %}
+<div>
+    <a href="/users/{{ user.id }}/edit">Edit Profile</a>
+</div>
+<div>
+    <h1>Recent Plans</h1>
+    <ul>
+        {% for plan in plans %}
+        <li><a href="/plans/{{ plan.id }}">{{ plan.title }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+{% else %}
+<div>
+    <ul>
+        {% for plan in plans %}
+        {% if plan.private is False %}
+        <li><a href="/plans/{{ plan.id }}">{{ plan.title }}</a></li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+<div>
+    <a href="/users/{{ user.id }}/plans">See all plans</a>
+</div>
 {% endblock %}

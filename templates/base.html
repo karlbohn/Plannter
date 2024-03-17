@@ -13,9 +13,11 @@
     <link rel="stylesheet"
             href="https://use.fontawesome.com/releases/v5.3.1/css/all.css">
     <link rel="shortcut icon" href="/static/favicon.ico">
-    <link rel="stylesheet" href="/static/style.css"
+    <link rel="stylesheet" href="/static/style.css">
 </head>
-<body>
+
+
+<body class="{% block body_class %}{% endblock %}">
     <nav class="navbar navbar-expand">
         <div class="container-fluid">
           <div class="navbar-header">
@@ -26,23 +28,29 @@
           </div>
           <ul class="nav navbar-nav navbar-right">
             {% if request.endpoint != None %}
-            <!-- <li>
-              <form class="navbar-form navbar-right" action="/users">
-                <input name="q" class="form-control" placeholder="" id="search">
+            <li>
+              <form class="navbar-form navbar-right" action="/search" method="GET">
+                <input name="q" class="form-control" placeholder="Search for a plant" id="search">
                 <button class="btn btn-default">
                   <span class="fa fa-search"></span>
                 </button>
               </form>
-            </li> -->
+            </li>
             {% endif %}
             {% if not g.user %}
-            <li><a class="nav-link" href="/register">Register</a></li>
-            <li><a class="nav-link" href="/login">Log In</a></li>
+            <li>
+              <a class="nav-link" href="/register">Register</a>
+            </li>
+            <li>
+              <a class="nav-link" href="/login">Log In</a>
+            </li>
             {% else %}
             <li>
-              <a class="nav-link" href="/{{ g.user.id }}/plans">My Plans</a>
-              <a class="nav-link" href="/logout">Logout</a>
+              <a class="nav-link" href="/users/{{ g.user.id }}/plans">My Plans</a>
             </li>
+              <li>
+                <a class="nav-link" href="/logout">Logout</a>
+              </li>
             {% endif %}
           </ul>
         </div>
@@ -57,15 +65,6 @@
           </ul>
         {% endif %}
       {% endwith %} </div>
-    <!-- {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        <ul class=flashes>
-        {% for category, message in messages %}
-          <li class="{{ category }}">{{ message }}</li>
-        {% endfor %}
-        </ul>
-      {% endif %}
-    {% endwith %} -->
 
     {% block content %}{% endblock %}
 </body>
