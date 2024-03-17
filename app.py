@@ -150,7 +150,6 @@ def edit_profile(user_id):
         redirect("/")    
     return render_template('/users/edit.html', form=form)
 
-
 @app.route('/users/<int:user_id>/plans')
 def show_user_plans(user_id):
     """Shows a list of a given user's plans"""
@@ -160,7 +159,8 @@ def show_user_plans(user_id):
 
     return render_template('/plans/list.html', plans=plans, user=user)
 
-### Plan section
+
+### Plan section - Showing plans, creating plans, editing plans, adding & removing from plans
 @app.route('/plans')
 def show_plans():
     """Shows list of first 20 public garden plans"""
@@ -193,8 +193,6 @@ def create_plan():
             db.session.add(NewPlan)
             db.session.commit()
 
-            id = NewPlan.id
-            # Incomplete
             flash('Plan created, add some plants to your plan!')
             return redirect("/search")
         return render_template("/plans/add.html", form=form)
@@ -217,11 +215,52 @@ def show_plan(plan_id):
     flash("Not authorized to view this plan")
     return redirect("/plans")
     
-# # Show plants contained in a given plan
+@app.route('/plans/<int:plan_id>/edit')
+def edit_plan(plan_id):
+    """Shows page to allow user to edit an existing plan"""
 
-# @app.route('/plans/<int:plan_id>/edit')
-# # Page to allow user to remove plants from their plan
+    plan = Plan.query.get(plan_id)
+    if plan.owner_id != g.user.id:
+        flash("Not authorized to edit this plan")
+        return redirect('/plans')
+    plant_roles = PlantRole.query.filter_by(plan_id = plan_id).all()
+    plants=[]
+    for plant_role in plant_roles:
+        plant = requests.get(f"https://perenual.com/api/species/details/{plant_role.plant_id}?key={api_key}").json()
+        plants.append(plant)            
+    return render_template("/plans/show.html", plan=plan, plants=plants)
 
+@app.route('/remove/<int:plan_id>/<int:plant_id>')
+def remove_plant(plan_id, plant_id):
+    """Removes a plant from a plan"""
+    plan = Plan.query.get(plan_id)
+    if plan.owner_id != g.user.id:
+        flash("Access Denied")
+        return redirect('/plans')
+    plant = PlantRole.query.filter(plan_id = plan_id, plant_id = plant_id).one()
+    db.session.remove(plant)
+    db.session.commit()
+    return redirect(f'/plans/{plan_id}/edit')
+
+@app.route('/addplant/<int:plant_id>', methods=["GET", "POST"])
+def add_plant(plant_id):
+    """Shows and handles form to add a plant to selected plan(s)"""
+    if g.user:
+        form = AddToPlanForm()
+        form.plans.choices = [(p.id, p.title) for p in Plan.query.filter_by(owner_id = g.user.id).all()]
+        if form.validate_on_submit():
+            plans = form.plans.data
+            for plan in plans:
+                role = PlantRole(plant_id = plant_id, plan_id = plan.id)
+                db.session.add(role)
+                db.session.commit()
+            return redirect('/')
+        return render_template('plants/add_to_plan.html', form=form, plant_id=plant_id)
+    flash('Must be logged in to add to a plan')
+    return redirect("/login")
+
+
+# Display Section - Shows index of plants, search results, individual plants
 @app.route('/search', methods=["GET"])
 def search():
     """Handles search from header search bar. If no search query, shows all plants"""
@@ -242,7 +281,6 @@ def search():
             plants.remove(plant)
             # This removes all plants not available in free version of API
     return render_template('search.html', plants=plants, api_key=api_key, page_num=1, search=search)
-# # Advanced search option to search plants
 
 @app.route('/search/page/<int:page_num>', methods=["GET", "POST"])
 def next_page_search(page_num):
@@ -285,22 +323,3 @@ def next_page_plants(page_num):
     ).json()['data']
 
     return render_template('/plants/index.html', plants=plants, page_num=page_num)
-
-@app.route('/addplant/<int:plant_id>', methods=["GET", "POST"])
-def add_plant(plant_id):
-    """Shows and handles form to add a plant to selected plan(s)"""
-    if g.user:
-        form = AddToPlanForm()
-        form.plans.choices = [(p.id, p.title) for p in Plan.query.filter_by(owner_id = g.user.id).all()]
-        # set_trace()
-        if form.is_submitted():
-            # plans = form.plans.data
-            # for plan in plans:
-            #     role = PlantRole(plant_id = plant_id, plan_id = plan.id)
-            #     db.session.add(role)
-            #     db.session.commit()
-            # flash("TESTING")
-            return redirect('/')
-        return render_template('plants/add_to_plan.html', form=form, plant_id=plant_id)
-    flash('Must be logged in to add to a plan')
-    return redirect("/login")
